@@ -1,1 +1,1 @@
-# github-action-update-translations
+# github-action-phaseapp-pull
