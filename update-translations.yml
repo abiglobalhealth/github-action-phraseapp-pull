@@ -1,0 +1,33 @@
+name: update-translations
+
+on: workflow_dispatch
+
+jobs:
+  update-translations:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: git config user.name "${{github.actor}}"
+        shell: bash
+      - run: git config user.email "${{github.actor}}@users.noreply.github.com"
+        shell: bash
+
+      # Remove all translations from src/locale/translations
+      - name: Remove translations
+        run: rm -rf src/locale/translations/*.json
+
+      # Download translations from Phrase
+      - name: Download translations
+        run: npx -y phrase-cli pull
+
+      # Commit and push changes
+      - name: Commit and push changes
+        run: |
+          git add src/locale/translations
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "feat(Translations): update translations (action)"
+            git push origin HEAD --follow-tags
+          fi
