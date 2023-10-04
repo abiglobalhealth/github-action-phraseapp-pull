@@ -1,13 +1,16 @@
-name: phraseapp-pull
-description: pull phrase-cli and push this changes in your current branch
+name: Phrase pull translations
+description: Pull translations from Phrase and commit them to the repository
 branding: { color: blue, icon: box }
+inputs:
+  working_directory:
+    { description: Working directory, required: false, default: "." }
 runs:
   using: composite
   steps:
     # Checkout the repository
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        fetch-depth: 1
     - run: git config user.name "${{github.actor}}"
       shell: bash
     - run: git config user.email "${{github.actor}}@users.noreply.github.com"
@@ -16,15 +19,18 @@ runs:
     # Remove all translations from src/locale/translations
     - name: Remove translations
       shell: bash
+      working-directory: ${{inputs.working_directory}}
       run: rm -rf src/locale/translations/*.json
 
     # Download translations from Phrase
     - name: Download translations
+      working-directory: ${{inputs.working_directory}}
       shell: bash
       run: npx -y phrase-cli pull
 
     # Commit and push changes
     - name: Commit and push changes
+      working-directory: ${{inputs.working_directory}}
       shell: bash
       run: |
         git add src/locale/translations
